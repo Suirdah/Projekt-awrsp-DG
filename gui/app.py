@@ -59,6 +59,9 @@ class PersonalPlannerApp:
         filter_button = tk.Button(filter_frame, text='Filtruj', command=self.filter_tasks, font=('Arial', 12))
         filter_button.grid(row=0, column=2, padx=5)
 
+        show_button = tk.Button(filter_frame, text='Pokaż listę', command=self.update_listbox, font=('Arial', 12))
+        show_button.grid(row=0, column=3, padx=5)
+
         self.update_listbox()
 
     def add_task(self):
@@ -73,6 +76,10 @@ class PersonalPlannerApp:
             messagebox.showwarning('Błąd', 'Nie można dodać pustego zadania')
 
     def edit_task(self):
+        if hasattr(self, 'edit_window') and self.edit_window.winfo_exists():
+            messagebox.showinfo('Edycja', 'Okno edycji jest już otwarte')
+            return
+
         try:
             select_index = self.task_listbox.curselection()[0]
             current_task = self.tasks[select_index]
@@ -88,19 +95,21 @@ class PersonalPlannerApp:
                     self.tasks[select_index] = {'task': new_task, 'date': new_date}
                     self.update_listbox()
                     self.save_tasks()
-                    edit_window.destroy()
+                    self.task_entry.delete(0, tk.END)
+                    self.edit_window.destroy()
                 else:
                     messagebox.showwarning('Błąd', 'Nie można zapisac pustego zadania')
 
-            edit_window = tk.Toplevel(self.root)
-            edit_window.title('Edytuj zadanie')
-            edit_window.geometry('300x100')
+            self.edit_window = tk.Toplevel(self.root)
+            self.edit_window.title('Edytuj zadanie')
+            self.edit_window.geometry('300x100')
 
-            label = tk.Label(edit_window, text='Potwierdź edycje zadania:', font=('Arial', 12))
+            label = tk.Label(self.edit_window, text='Potwierdź edycje zadania:', font=('Arial', 12))
             label.pack(pady=10)
 
-            save_button = tk.Button(edit_window, text='Zapisz', command=save_edit, font=('Arial', 12))
+            save_button = tk.Button(self.edit_window, text='Zapisz', command=save_edit, font=('Arial', 12))
             save_button.pack(pady=10)
+
         except IndexError:
             messagebox.showwarning('Błąd', 'Nie wybrano żadnego zadania do edycji')
 
@@ -127,12 +136,15 @@ class PersonalPlannerApp:
             messagebox.showwarning('Błąd', 'Nie udało sie odczytać danych')
 
     def update_listbox(self):
+        self.tasks.sort(key=lambda task: task['date'])
+
         self.task_listbox.delete(0, tk.END)
         for task in self.tasks:
             self.task_listbox.insert(tk.END, f'{task['task']} (Data: {task['date']})')
 
     def filter_tasks(self):
         select_task = self.filter_calendar.get_date()
+        self.task_listbox.delete(0, tk.END)
         for task in self.tasks:
             if task['date'] == select_task:
                 self.task_listbox.insert(tk.END, f'{task['task']} (Data: {task['date']})')
