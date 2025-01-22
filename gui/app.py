@@ -1,8 +1,9 @@
 import json
 import tkinter as tk
-from contextlib import nullcontext
+from collections import Counter
 from tkinter import messagebox
 from tkcalendar import Calendar
+import matplotlib.pyplot as plt
 
 
 class PersonalPlannerApp:
@@ -41,7 +42,10 @@ class PersonalPlannerApp:
         edit_button.grid(row=0, column=0, padx=5)
 
         delete_button = tk.Button(frame, text='Usuń', command=self.delete_task, font=('Arial', 12))
-        delete_button.grid(row=0, column=1)
+        delete_button.grid(row=0, column=1, padx=5)
+
+        chart_button = tk.Button(frame, text='Wykres', command=self.chart, font=('Arial', 12))
+        chart_button.grid(row=0, column=2, padx=5)
 
         filter_frame = tk.Frame(root)
         filter_frame.pack(pady=10)
@@ -110,3 +114,21 @@ class PersonalPlannerApp:
         for task in self.tasks:
             if task['date'] == select_task:
                 self.task_listbox.insert(tk.END, f'{task['task']} (Data: {task['date']})')
+
+    def chart(self):
+        if not self.tasks:
+            messagebox.showinfo('Statystyki', 'Brak danyhc do wyświetlenia')
+            return
+        task_count = Counter(task['date'] for task in self.tasks)
+
+        date = list(task_count.keys())
+        number = list(task_count.values())
+
+        plt.figure(figsize=(10, 5))
+        plt.bar(date, number)
+        plt.title('Liczba zadań w podizale na daty')
+        plt.xlabel('Data')
+        plt.ylabel('Liczba zadań')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.show()
