@@ -84,28 +84,32 @@ class PersonalPlannerApp:
             select_index = self.task_listbox.curselection()[0]
             current_task = self.tasks[select_index]
 
-            self.task_entry.delete(0, tk.END)
-            self.task_entry.insert(0, current_task['task'])
-            self.calendar.selection_set(current_task['date'])
+            self.edit_window = tk.Toplevel(self.root)
+            self.edit_window.title('Edytuj zadanie')
+            self.edit_window.geometry('400x350')
+
+            task_label = tk.Label(self.edit_window, text='Treść zadania:', font=('Arial', 12))
+            task_label.pack(pady=5)
+            task_entry = tk.Entry(self.edit_window, width=40, font=('Arial', 12))
+            task_entry.pack(pady=5)
+            task_entry.insert(0, current_task['task'])
+
+            date_label = tk.Label(self.edit_window, text='Data zadania:', font=('Arial', 12))
+            date_label.pack(pady=5)
+            calendar = Calendar(self.edit_window, selectmode='day', date_pattern='dd-mm-yyyy')
+            calendar.pack(pady=5)
+            calendar.selection_set(current_task['date'])
 
             def save_edit():
-                new_task = self.task_entry.get().strip()
-                new_date = self.calendar.get_date()
+                new_task = task_entry.get().strip()
+                new_date = calendar.get_date()
                 if new_task:
                     self.tasks[select_index] = {'task': new_task, 'date': new_date}
                     self.update_listbox()
                     self.save_tasks()
-                    self.task_entry.delete(0, tk.END)
                     self.edit_window.destroy()
                 else:
                     messagebox.showwarning('Błąd', 'Nie można zapisac pustego zadania')
-
-            self.edit_window = tk.Toplevel(self.root)
-            self.edit_window.title('Edytuj zadanie')
-            self.edit_window.geometry('300x100')
-
-            label = tk.Label(self.edit_window, text='Potwierdź edycje zadania:', font=('Arial', 12))
-            label.pack(pady=10)
 
             save_button = tk.Button(self.edit_window, text='Zapisz', command=save_edit, font=('Arial', 12))
             save_button.pack(pady=10)
@@ -117,7 +121,9 @@ class PersonalPlannerApp:
         try:
             select_index = self.task_listbox.curselection()[0]
 
+            self.tasks.pop(select_index)
             self.task_listbox.delete(select_index)
+            self.save_tasks()
         except IndexError:
             messagebox.showwarning('Błąd', 'Nie wybrano żadnego zadania do edycji')
 
