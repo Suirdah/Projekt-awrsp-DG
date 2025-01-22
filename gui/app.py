@@ -78,7 +78,29 @@ class PersonalPlannerApp:
             current_task = self.tasks[select_index]
 
             self.task_entry.delete(0, tk.END)
-            self.task_entry.insert(0, current_task)
+            self.task_entry.insert(0, current_task['task'])
+            self.calendar.selection_set(current_task['date'])
+
+            def save_edit():
+                new_task = self.task_entry.get().strip()
+                new_date = self.calendar.get_date()
+                if new_task:
+                    self.tasks[select_index] = {'task': new_task, 'date': new_date}
+                    self.update_listbox()
+                    self.save_tasks()
+                    edit_window.destroy()
+                else:
+                    messagebox.showwarning('Błąd', 'Nie można zapisac pustego zadania')
+
+            edit_window = tk.Toplevel(self.root)
+            edit_window.title('Edytuj zadanie')
+            edit_window.geometry('300x100')
+
+            label = tk.Label(edit_window, text='Potwierdź edycje zadania:', font=('Arial', 12))
+            label.pack(pady=10)
+
+            save_button = tk.Button(edit_window, text='Zapisz', command=save_edit, font=('Arial', 12))
+            save_button.pack(pady=10)
         except IndexError:
             messagebox.showwarning('Błąd', 'Nie wybrano żadnego zadania do edycji')
 
