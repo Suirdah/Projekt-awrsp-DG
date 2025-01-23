@@ -109,7 +109,7 @@ class PersonalPlannerApp:
                     self.save_tasks()
                     self.edit_window.destroy()
                 else:
-                    messagebox.showwarning('Błąd', 'Nie można zapisac pustego zadania')
+                    messagebox.showwarning('Błąd', 'Nie można zapisać pustego zadania')
 
             save_button = tk.Button(self.edit_window, text='Zapisz', command=save_edit, font=('Arial', 12))
             save_button.pack(pady=10)
@@ -125,7 +125,7 @@ class PersonalPlannerApp:
             self.task_listbox.delete(select_index)
             self.save_tasks()
         except IndexError:
-            messagebox.showwarning('Błąd', 'Nie wybrano żadnego zadania do edycji')
+            messagebox.showwarning('Błąd', 'Nie wybrano żadnego zadania do  usunięcia')
 
     def save_tasks(self):
         try:
@@ -157,7 +157,7 @@ class PersonalPlannerApp:
 
     def chart(self):
         if not self.tasks:
-            messagebox.showinfo('Statystyki', 'Brak danyhc do wyświetlenia')
+            messagebox.showinfo('Statystyki', 'Brak danych do wyświetlenia')
             return
         task_count = Counter(task['date'] for task in self.tasks)
 
@@ -166,7 +166,7 @@ class PersonalPlannerApp:
 
         plt.figure(figsize=(10, 5))
         plt.bar(date, number)
-        plt.title('Liczba zadań w podizale na daty')
+        plt.title('Liczba zadań w podziale na daty')
         plt.xlabel('Data')
         plt.ylabel('Liczba zadań')
         plt.xticks(rotation=45)
